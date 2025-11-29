@@ -2,13 +2,51 @@
 
 A flexible children's story generator that lets you choose any LLM provider (OpenAI, Anthropic, Google Gemini) for story generation while using NanoBanana (Gemini's flash image model) for beautiful illustrations.
 
+**✨ NEW: Interactive GUI!** Transform educational documents and complex texts into fun, memorable children's stories with our easy-to-use web interface!
+
 ## Features
 
+- **🎨 Interactive Web GUI**: Upload documents (PDF, DOCX, TXT) or paste text to generate educational stories
+- **📚 Educational Mode**: Transform complex content into child-friendly learning adventures
 - **Decoupled LLM Architecture**: Switch between OpenAI GPT, Anthropic Claude, or Google Gemini for story generation
 - **Consistent Image Generation**: Uses Google's NanoBanana (gemini-2.0-flash-exp) for high-quality illustrations
-- **Character Profiles**: Pre-configured characters (Timmy the Beetle, Tiny Philosopher Kid)
-- **Configurable**: Control story themes, character selection, and output paths
-- **Age-Appropriate**: Designed for ages 4-8 with gentle, vivid bedtime stories
+- **Character Profiles**: Pre-configured characters (Timmy the Beetle, Tiny Philosopher Kid) or create your own
+- **Configurable**: Control story themes, character selection, output paths, and age groups
+- **Age-Appropriate**: Designed for ages 4-10 with gentle, vivid bedtime stories
+- **Dual Interface**: Use the GUI or command-line interface
+
+## Two Ways to Use
+
+### Option 1: Interactive GUI (Recommended for Beginners) 🆕
+
+Perfect for uploading educational materials and creating stories interactively!
+
+```bash
+# Install dependencies with GUI support
+pip install -r requirements.txt
+
+# Set your API keys
+export OPENAI_API_KEY="sk-..."
+export GEMINI_API_KEY="..."
+
+# Launch the web interface
+streamlit run app.py
+```
+
+Then upload documents, paste text, and watch complex content transform into engaging stories!
+
+👉 **See the [GUI Guide](GUI_GUIDE.md) for detailed instructions and examples.**
+
+### Option 2: Command Line (For Automation & Scripts)
+
+Perfect for batch processing and integration into other tools!
+
+```bash
+python story_and_image.py \
+  --theme "a tiny adventure in the garden" \
+  --character "Timmy the Beetle" \
+  --persona timmy
+```
 
 ## Architecture
 
