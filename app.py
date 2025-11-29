@@ -450,16 +450,71 @@ def step_5_review():
         provider = st.selectbox(
             "Text Generation Provider",
             ["openai", "anthropic", "gemini"],
-            help="Choose which LLM to use"
+            help="Choose which LLM to use for story generation"
         )
         os.environ["LLM_PROVIDER"] = provider
 
-        model_defaults = {
-            "openai": "gpt-4o",
-            "anthropic": "claude-3-5-sonnet-20241022",
-            "gemini": "gemini-1.5-pro-latest"
+        # Available models for each provider
+        available_models = {
+            "openai": [
+                "gpt-4o",
+                "gpt-4o-mini",
+                "gpt-4-turbo",
+                "gpt-4",
+                "gpt-3.5-turbo"
+            ],
+            "anthropic": [
+                "claude-3-5-sonnet-20241022",
+                "claude-3-5-haiku-20241022",
+                "claude-3-opus-20240229",
+                "claude-3-sonnet-20240229",
+                "claude-3-haiku-20240307"
+            ],
+            "gemini": [
+                "gemini-1.5-pro-latest",
+                "gemini-1.5-flash",
+                "gemini-1.5-flash-8b",
+                "gemini-1.5-pro",
+                "gemini-pro"
+            ]
         }
-        model = st.text_input("Model", value=model_defaults[provider])
+
+        model_descriptions = {
+            "openai": {
+                "gpt-4o": "Latest GPT-4o - Most capable & creative (recommended)",
+                "gpt-4o-mini": "GPT-4o Mini - Faster & cheaper",
+                "gpt-4-turbo": "GPT-4 Turbo - Previous flagship",
+                "gpt-4": "GPT-4 - Stable version",
+                "gpt-3.5-turbo": "GPT-3.5 - Budget option"
+            },
+            "anthropic": {
+                "claude-3-5-sonnet-20241022": "Claude 3.5 Sonnet - Most capable (recommended)",
+                "claude-3-5-haiku-20241022": "Claude 3.5 Haiku - Fast & efficient",
+                "claude-3-opus-20240229": "Claude 3 Opus - Previous flagship",
+                "claude-3-sonnet-20240229": "Claude 3 Sonnet - Balanced",
+                "claude-3-haiku-20240307": "Claude 3 Haiku - Fast"
+            },
+            "gemini": {
+                "gemini-1.5-pro-latest": "Gemini 1.5 Pro - Most capable (recommended)",
+                "gemini-1.5-flash": "Gemini 1.5 Flash - Fast & efficient",
+                "gemini-1.5-flash-8b": "Gemini 1.5 Flash 8B - Fastest",
+                "gemini-1.5-pro": "Gemini 1.5 Pro - Stable version",
+                "gemini-pro": "Gemini Pro - Legacy model"
+            }
+        }
+
+        # Model selection with descriptions
+        model_options = available_models[provider]
+        model_labels = [f"{m} - {model_descriptions[provider][m]}" for m in model_options]
+
+        selected_index = st.selectbox(
+            "Model",
+            range(len(model_options)),
+            format_func=lambda i: model_labels[i],
+            help="Choose the specific model for text generation"
+        )
+
+        model = model_options[selected_index]
         os.environ["LLM_MODEL"] = model
 
     # Generate button
