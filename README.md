@@ -29,24 +29,62 @@ A flexible children's story generator that lets you choose any LLM provider (Ope
     └───────────────────────────────────────────┘
 ```
 
+## Prerequisites
+
+Before you begin, ensure you have:
+
+- **Python 3.8 or higher** (Check with `python --version`)
+- **pip** (Python package manager)
+- **API keys** from at least one LLM provider:
+  - [OpenAI API Key](https://platform.openai.com/api-keys) (requires billing setup)
+  - [Anthropic API Key](https://console.anthropic.com/) (requires billing setup)
+  - [Google AI Studio API Key](https://makersuite.google.com/app/apikey)
+- **Gemini API key** (required for image generation, even if you use OpenAI/Anthropic for stories)
+
 ## Installation
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
+git clone https://github.com/your-username/Childrens_story_generator.git
 cd Childrens_story_generator
 ```
 
-2. Install dependencies:
+2. Create and activate a virtual environment (recommended):
 ```bash
+# On Linux/Mac:
+python3 -m venv venv
+source venv/bin/activate
+
+# On Windows:
+python -m venv venv
+venv\Scripts\activate
+```
+
+3. Install dependencies:
+```bash
+# Option 1: Install only what you need (recommended)
+pip install google-genai pillow  # Core dependencies
+
+# Then install your chosen LLM provider:
+pip install openai      # For OpenAI
+# OR
+pip install anthropic   # For Anthropic
+# OR both are already included in google-genai for Gemini
+
+# Option 2: Install everything (all providers)
 pip install -r requirements.txt
 ```
 
-3. Set up your environment variables (see Configuration section below)
+4. Verify installation:
+```bash
+python -c "import PIL, google.genai; print('✓ Core dependencies installed')"
+```
+
+5. Set up your environment variables (see Configuration section below)
 
 ## Configuration
 
-Create a `.env` file or set environment variables:
+Set up your environment variables:
 
 ```bash
 # Choose your LLM provider for story generation
@@ -56,13 +94,42 @@ export LLM_MODEL="gpt-4o"             # or "claude-3-5-sonnet-20241022" or "gemi
 # API Keys (set the ones you'll use)
 export OPENAI_API_KEY="sk-..."
 export ANTHROPIC_API_KEY="sk-ant-..."
-export GEMINI_API_KEY="..."
+export GEMINI_API_KEY="..."           # REQUIRED for image generation
 
 # Image model (NanoBanana) - usually keep this as default
 export GEMINI_IMAGE_MODEL="gemini-2.0-flash-exp"
 ```
 
+**Note:** If using Anthropic or Gemini, you MUST also set the appropriate `LLM_MODEL`:
+- Anthropic: `claude-3-5-sonnet-20241022`, `claude-3-5-haiku-20241022`
+- Gemini: `gemini-1.5-pro-latest`, `gemini-1.5-flash`
+
 See `.env.example` for a template.
+
+## Quick Start
+
+Test your setup with a simple story:
+
+```bash
+python story_and_image.py \
+  --theme "a tiny adventure in the garden" \
+  --character "Timmy the Beetle" \
+  --persona timmy
+```
+
+You should see:
+```
+Validating inputs...
+Generating story with theme: 'a tiny adventure in the garden'...
+Saving story...
+✓ Story saved to: output/story.txt
+Generating illustration...
+✓ Image saved to: output/story_image.png
+
+✓ Story generation complete!
+```
+
+Check the `output/` directory for your generated story and illustration!
 
 ## Usage
 
@@ -194,16 +261,114 @@ Childrens_story_generator/
 
 ## Troubleshooting
 
-**Import errors?**
-- Make sure you've installed the provider SDK you're using: `pip install openai` or `pip install anthropic`
+### Import Errors
 
-**API key errors?**
-- Check that your environment variables are set correctly
-- Verify your API keys are valid and have sufficient credits
+**Problem:** `ModuleNotFoundError: No module named 'openai'` (or `anthropic`, `google.genai`)
 
-**No image generated?**
-- Ensure `GEMINI_API_KEY` is set (required for NanoBanana)
-- Check that the Gemini API is enabled in your Google Cloud project
+**Solution:**
+- Install the missing provider SDK:
+  ```bash
+  pip install openai      # For OpenAI
+  pip install anthropic   # For Anthropic
+  pip install google-genai  # For Gemini
+  ```
+- Verify installation: `pip list | grep openai`
+
+### API Key Errors
+
+**Problem:** `RuntimeError: OPENAI_API_KEY not set` (or similar for other providers)
+
+**Solution:**
+1. Verify your environment variable is set: `echo $OPENAI_API_KEY`
+2. If empty, export it: `export OPENAI_API_KEY="sk-your-key-here"`
+3. Check that your API key is valid in the provider's dashboard
+4. Ensure your API key has billing enabled and sufficient credits
+
+**Problem:** `RuntimeError: OpenAI API key is invalid`
+
+**Solution:**
+- Verify the API key hasn't been revoked
+- Check for extra spaces or quotes in your key
+- Generate a new API key from the provider dashboard
+
+### Model Errors
+
+**Problem:** `RuntimeError: Invalid OpenAI model: claude-3-5-sonnet-20241022`
+
+**Solution:**
+- You're using a model from the wrong provider! Check that `LLM_MODEL` matches `LLM_PROVIDER`:
+  - OpenAI: `gpt-4o`, `gpt-4o-mini`, `gpt-4-turbo`
+  - Anthropic: `claude-3-5-sonnet-20241022`, `claude-3-5-haiku-20241022`
+  - Gemini: `gemini-1.5-pro-latest`, `gemini-1.5-flash`
+
+### No Image Generated
+
+**Problem:** Story generates but no image appears
+
+**Solution:**
+- Ensure `GEMINI_API_KEY` is set (required for ALL image generation)
+- Check Gemini API quota in [Google Cloud Console](https://console.cloud.google.com/)
+- Verify the output directory is writable
+- Try a different theme - some themes may violate content policies
+
+### Rate Limiting
+
+**Problem:** `RuntimeError: OpenAI rate limit exceeded`
+
+**Solution:**
+- Wait 30-60 seconds and try again
+- Upgrade your API plan for higher rate limits
+- Switch to a different provider temporarily
+
+### Permission Errors
+
+**Problem:** `Permission denied` when saving files
+
+**Solution:**
+- Check write permissions: `ls -ld output/`
+- Create output directory manually: `mkdir -p output`
+- Run with appropriate permissions or change output directory
+
+### Input Validation Errors
+
+**Problem:** `ValueError: Input exceeds maximum length`
+
+**Solution:**
+- Keep themes under 200 characters
+- Keep character names under 100 characters
+- Simplify your input text
+
+**Problem:** `ValueError: Input contains potentially malicious content`
+
+**Solution:**
+- Avoid phrases like "ignore previous instructions" in your theme
+- Use simple, straightforward language
+- If you think this is a false positive, rephrase your theme slightly
+
+### Path Security Errors
+
+**Problem:** `ValueError: Security error: Path '../../../etc/passwd' attempts to escape base directory`
+
+**Solution:**
+- Don't use `..` in output paths
+- Output files must be within the `output/` directory
+- Use simple filenames like `my_story.txt`
+
+### General Tips
+
+- **Check your internet connection** - All features require API access
+- **Verify Python version**: `python --version` (should be 3.8+)
+- **Check API status pages**:
+  - [OpenAI Status](https://status.openai.com/)
+  - [Anthropic Status](https://status.anthropic.com/)
+  - [Google Cloud Status](https://status.cloud.google.com/)
+
+### Still Having Issues?
+
+1. Enable verbose error messages by running with `python -u story_and_image.py ...`
+2. Check that all environment variables are set: `env | grep -E "(LLM|API_KEY)"`
+3. Try the Quick Start example first to verify basic functionality
+4. Open an issue on GitHub with the full error message and your setup details (but DO NOT include API keys!)
 
 ## License
 

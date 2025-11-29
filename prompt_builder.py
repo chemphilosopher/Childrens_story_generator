@@ -1,4 +1,15 @@
 # prompt_builder.py
+"""
+Character profile definitions and image prompt builder.
+
+This module contains pre-defined character profiles for children's story
+illustrations and builds detailed visual prompts for the NanoBanana image
+generation model based on story content and selected character persona.
+
+Character Profiles:
+    - Timmy the Beetle: Friendly beetle character for nature-themed stories
+    - Tiny Philosopher Kid: Young thoughtful child for contemplative stories
+"""
 from textwrap import shorten
 
 TIMMY_PROFILE = """
@@ -24,6 +35,25 @@ def build_image_prompt(
     story_text: str,
     character: str = "timmy",
 ) -> str:
+    """
+    Build a detailed image generation prompt from story content.
+
+    Creates a comprehensive prompt for NanoBanana (Gemini image model) that
+    includes character visual details, scene context, and artistic direction
+    based on the selected character persona.
+
+    Args:
+        story_title: Title/description of the story.
+        story_text: Full text of the generated story.
+        character: Character persona - "timmy" for beetle, "philosopher" for kid.
+
+    Returns:
+        Formatted image generation prompt string.
+
+    Note:
+        Story text is shortened to 400 characters to fit within prompt limits
+        while providing enough context for visual generation.
+    """
     scene_snippet = shorten(story_text.replace("\n", " "), width=400, placeholder="…")
 
     if character.lower() == "timmy":
